@@ -3,19 +3,24 @@ package ee.qualitylab.lemmikuleidja.app.activities;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.location.Address;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.OvershootInterpolator;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 import butterknife.InjectView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import ee.qualitylab.lemmikuleidja.app.R;
+import ee.qualitylab.lemmikuleidja.app.service.LocationService;
 import ee.qualitylab.lemmikuleidja.app.service.PostService;
 import ee.qualitylab.lemmikuleidja.app.utilities.Utils;
 
@@ -38,6 +43,8 @@ public class PublishActivity extends BaseActivity {
   private Uri photoUri;
   private int photoSize;
 
+  LocationService locationService;
+
   public static void openWithPhotoUri(Activity openingActivity, Uri photoUri) {
     Intent intent = new Intent(openingActivity, PublishActivity.class);
     intent.putExtra(ARG_TAKEN_PHOTO_URI, photoUri);
@@ -48,8 +55,19 @@ public class PublishActivity extends BaseActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_publish);
+    locationService = new LocationService(this);
     toolbar.setNavigationIcon(R.drawable.ic_arrow_back_grey600_24dp);
     photoSize = getResources().getDimensionPixelSize(R.dimen.publish_photo_thumbnail_size);
+
+    if (locationService.canGetLocation()){
+      try {
+        Address address = locationService.getLocation();
+        locationET.setText(address.getAddressLine(0)+", "+address.getAddressLine(1)+", "+address.getAddressLine(2));
+        locationET.setTextColor(Color.GREEN);
+      }catch (NullPointerException e){
+        locationET.setText("");
+      }
+    }
 
     if (savedInstanceState == null) {
       photoUri = getIntent().getParcelableExtra(ARG_TAKEN_PHOTO_URI);
@@ -64,6 +82,25 @@ public class PublishActivity extends BaseActivity {
         ivPhoto.getViewTreeObserver().removeOnPreDrawListener(this);
         loadThumbnailPhoto();
         return true;
+      }
+    });
+
+    locationET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+
+      public void onFocusChange(View v, boolean hasFocus) {
+        if (!hasFocus) {
+          try {
+            Address address = locationService.getLocationFromString(locationET.getText().toString());
+            locationET.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1) + ", " + address.getAddressLine(2));
+            locationET.setTextColor(Color.GREEN);
+          }catch (NullPointerException e){
+            locationET.setTextColor(Color.RED);
+          }
+        }else {
+          locationET.setText("");
+          locationET.setTextColor(Color.BLACK);
+        }
+
       }
     });
   }
@@ -108,12 +145,23 @@ public class PublishActivity extends BaseActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if (item.getItemId() == R.id.action_publish) {
-      uploadPost();
-      bringMainActivityToTop();
-      return true;
+      if (validatePost()) {
+        uploadPost();
+        bringMainActivityToTop();
+        return true;
+      }
+      return false;
     } else {
       return super.onOptionsItemSelected(item);
     }
+  }
+
+  private boolean validatePost(){
+    if (photoUri.getPath() == null || locationService.getLocationFromString(locationET.getText().toString()) == null) {
+      Toast.makeText(getApplicationContext(),"Kontrolli sisestatud andmeid!", Toast.LENGTH_SHORT).show();
+      return false;
+    }
+    return true;
   }
 
   private void uploadPost() {

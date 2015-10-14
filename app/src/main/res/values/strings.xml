@@ -3,5 +3,7 @@
 
     <string name="app_name">Lemmikuleidja</string>
     <string name="action_settings">Seaded</string>
+    <string name="drawer_open">drawer open</string>
+    <string name="drawer_close">drawer close</string>
 
 </resources>

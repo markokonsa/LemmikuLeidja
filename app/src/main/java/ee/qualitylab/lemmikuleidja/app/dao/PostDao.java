@@ -15,18 +15,13 @@ public class PostDao {
   public static String PICTURE_TAG = "photo";
   public static String CITY_TAG = "city";
   public static String COUNTRY_TAG = "country";
+  public static String DESCRIPTION_TAG = "description";
 
   public Context context;
   private SendingProgressView progressView;
 
   public PostDao(Context context){
     this.context = context;
-  }
-
-  public List<ParseObject> getPosts() throws ParseException {
-    ParseQuery<ParseObject> query = ParseQuery.getQuery(POSTS_TAG);
-    query.orderByDescending("createdAt");
-    return query.find();
   }
 
   public List<ParseObject> getPostsInRadius(ParseGeoPoint current, double radius) throws ParseException {
@@ -47,11 +42,12 @@ public class PostDao {
     object.put(CITY_TAG, post.getCity());
     object.put(COUNTRY_TAG, post.getCountry());
     object.put(LOCATION_TAG, post.getGeoPoint());
+    object.put(DESCRIPTION_TAG, post.getDescription());
     object.saveInBackground(new SaveCallback() {
 
       @Override
       public void done(ParseException e) {
-        
+        //e.printStackTrace();
       }
     });
   }

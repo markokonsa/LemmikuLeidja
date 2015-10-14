@@ -25,6 +25,7 @@ import java.util.List;
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
   private static final int VIEW_TYPE_DEFAULT = 1;
   private static final int VIEW_TYPE_LOADER = 2;
+  private static final int VIEW_TYPE_UPDATE = 3;
 
   private Context context;
   private int lastAnimatedPosition = -1;
@@ -34,6 +35,10 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
   private boolean showLoadingView = false;
   private int loadingViewSize = Utils.dpToPx(200);
   private List<Post> posts;
+
+  public void setPosts(List<Post> posts) {
+    this.posts = posts;
+  }
 
   @SuppressLint("SimpleDateFormat")
   SimpleDateFormat format = new SimpleDateFormat("MMM dd HH:mm");
@@ -48,7 +53,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
     final View view = LayoutInflater.from(context).inflate(R.layout.item_feed, parent, false);
     final CellFeedViewHolder cellFeedViewHolder = new CellFeedViewHolder(view);
     if (viewType == VIEW_TYPE_DEFAULT) {
-      cellFeedViewHolder.btnMore.setOnClickListener(this);
       cellFeedViewHolder.ivFeedCenter.setOnClickListener(this);
     } else if (viewType == VIEW_TYPE_LOADER) {
       View bgView = new View(context);
@@ -66,8 +70,13 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
       cellFeedViewHolder.vImageRoot.addView(sendingProgressView);
       cellFeedViewHolder.vSendingProgress = sendingProgressView;
     }
-
     return cellFeedViewHolder;
+  }
+
+  public void clearAdapter(){
+    lastAnimatedPosition = -1;
+    itemsCount = 0;
+    posts.clear();
   }
 
   private void runEnterAnimation(View view, int position) {
@@ -94,45 +103,54 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
   }
 
   private void bindDefaultFeedItem(int position, CellFeedViewHolder holder) {
+      BitmapFactory.Options options = new BitmapFactory.Options();
+      options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+      holder.ivFeedCenter.setImageBitmap(posts.get(position).getPicBitmap());
+      holder.dateTextView.setText(format.format(posts.get(position).getTime()));
+      holder.locationTextView.setText(posts.get(position).getAddress() + ", " + posts.get(position).getCity() + ", " + posts.get(position).getCountry());
+      holder.feedDescriptionTextView.setText(posts.get(position).getDescription());
 
-    BitmapFactory.Options options = new BitmapFactory.Options();
-    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-    holder.ivFeedCenter.setImageBitmap(posts.get(position).getPicBitmap());
-    holder.dateTextView.setText(format.format(posts.get(position).getTime()));
-    holder.locationTextView.setText(posts.get(position).getAddress()+", "+posts.get(position).getCity()+", "+posts.get(position).getCountry());
-
-    holder.btnMore.setTag(position);
-    holder.ivFeedCenter.setTag(holder);
+      holder.ivFeedCenter.setTag(holder);
   }
 
   private void bindLoadingFeedItem(final CellFeedViewHolder holder) {
-    holder.ivFeedCenter.setImageResource(R.drawable.example_picture);
-    holder.vSendingProgress.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-      @Override
-      public boolean onPreDraw() {
-        holder.vSendingProgress.getViewTreeObserver().removeOnPreDrawListener(this);
-        holder.vSendingProgress.startProgress();
-        return true;
-      }
-    });
-    holder.vSendingProgress.setOnLoadingFinishedListener(new SendingProgressView.OnLoadingFinishedListener() {
-      @Override
-      public void onLoadingFinished() {
-        holder.vSendingProgress.animate().scaleY(0).scaleX(0).setDuration(200).setStartDelay(100);
-        holder.vProgressBg.animate().alpha(0.f).setDuration(200).setStartDelay(100)
-                .setListener(new AnimatorListenerAdapter() {
-                  @Override
-                  public void onAnimationEnd(Animator animation) {
-                    holder.vSendingProgress.setScaleX(1);
-                    holder.vSendingProgress.setScaleY(1);
-                    holder.vProgressBg.setAlpha(1);
-                    showLoadingView = false;
-                    notifyItemChanged(0);
-                  }
-                })
-                .start();
-      }
-    });
+    Post last = Post.getLastlyAddedPost();
+
+    if (last != null) {
+      posts.add(0,last);
+      holder.ivFeedCenter.setImageBitmap(last.getPicBitmap());
+      holder.dateTextView.setText(format.format(last.getTime()));
+      holder.locationTextView.setText(last.getAddress() + ", " + last.getCity() + ", " + last.getCountry());
+      holder.feedDescriptionTextView.setText(last.getDescription());
+
+      holder.ivFeedCenter.setTag(holder);
+      holder.vSendingProgress.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+        @Override
+        public boolean onPreDraw() {
+          holder.vSendingProgress.getViewTreeObserver().removeOnPreDrawListener(this);
+          holder.vSendingProgress.startProgress();
+          return true;
+        }
+      });
+      holder.vSendingProgress.setOnLoadingFinishedListener(new SendingProgressView.OnLoadingFinishedListener() {
+        @Override
+        public void onLoadingFinished() {
+          holder.vSendingProgress.animate().scaleY(0).scaleX(0).setDuration(200).setStartDelay(100);
+          holder.vProgressBg.animate().alpha(0.f).setDuration(200).setStartDelay(100)
+                  .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                      holder.vSendingProgress.setScaleX(1);
+                      holder.vSendingProgress.setScaleY(1);
+                      holder.vProgressBg.setAlpha(1);
+                      showLoadingView = false;
+                      notifyItemChanged(0);
+                    }
+                  })
+                  .start();
+        }
+      });
+    }
   }
 
   @Override
@@ -174,14 +192,14 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
   public static class CellFeedViewHolder extends RecyclerView.ViewHolder {
     @InjectView(R.id.ivFeedCenter)
     ImageView ivFeedCenter;
-    @InjectView(R.id.btnMore)
-    ImageView btnMore;
     @InjectView(R.id.vImageRoot)
     FrameLayout vImageRoot;
     @InjectView(R.id.feed_date_textview)
     TextView dateTextView;
     @InjectView(R.id.feed_location_textview)
     TextView locationTextView;
+    @InjectView(R.id.feed_description)
+    TextView feedDescriptionTextView;
 
     SendingProgressView vSendingProgress;
     View vProgressBg;

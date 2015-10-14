@@ -16,6 +16,15 @@ public class Post {
   private String city;
   private String country;
   private String description;
+  public static Post lastlyAddedPost;
+
+  public static Post getLastlyAddedPost() {
+    return lastlyAddedPost;
+  }
+
+  public static void setLastlyAddedPost(Post lastlyAddedPost) {
+    Post.lastlyAddedPost = lastlyAddedPost;
+  }
 
   public ParseGeoPoint getGeoPoint() {
     return geoPoint;

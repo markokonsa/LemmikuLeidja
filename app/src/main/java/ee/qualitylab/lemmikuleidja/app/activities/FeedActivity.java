@@ -3,11 +3,14 @@ package ee.qualitylab.lemmikuleidja.app.activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
@@ -39,16 +42,18 @@ public class FeedActivity extends BaseDrawerActivity implements FeedAdapter.OnFe
   @InjectView(R.id.btnCreate)
   FloatingActionButton fabCreate;
 
-  private FeedAdapter feedAdapter;
   private PostService postService;
   private LocationService locationService;
 
   private boolean pendingIntroAnimation;
+  private FeedAdapter feedAdapter;
+  private List<Post> posts;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_feed);
+    setupActionBarToggle();
     setupFeed();
 
     if (savedInstanceState == null) {
@@ -69,13 +74,13 @@ public class FeedActivity extends BaseDrawerActivity implements FeedAdapter.OnFe
     rvFeed.setLayoutManager(linearLayoutManager);
     postService = new PostService(this);
     locationService = new LocationService(this);
+    posts = new ArrayList<>();
 
-    List<Post> postList = new ArrayList<>();
-    if (locationService.canGetLocation()){
-
+    if (!addAddressET.getText().toString().equals("") || locationService.getLocationFromString(addAddressET.getText().toString()) != null){
+      posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()));
     }
 
-    feedAdapter = new FeedAdapter(this, postService.generateFeed());
+    feedAdapter = new FeedAdapter(this, posts);
     rvFeed.setAdapter(feedAdapter);
     rvFeed.setOnScrollListener(new RecyclerView.OnScrollListener() {
       @Override
@@ -140,6 +145,32 @@ public class FeedActivity extends BaseDrawerActivity implements FeedAdapter.OnFe
             .setDuration(ANIM_DURATION_FAB)
             .start();
     feedAdapter.updateItems(true);
+  }
+
+  private void setupActionBarToggle() {
+
+    ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
+            drawerLayout,                    /* DrawerLayout object */
+            R.string.drawer_open,
+            R.string.drawer_close) {
+
+      @Override
+      public void onDrawerClosed(View drawerView) {
+        super.onDrawerClosed(drawerView);
+        boolean location = locationService.getLocationFromString(addAddressET.getText().toString()) == null;
+
+        if (addAddressET.getText().toString().equals("") || location) {
+          drawerLayout.openDrawer(Gravity.LEFT);
+          addAddressET.setTextColor(Color.RED);
+        } else {
+          posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()));
+          feedAdapter.clearAdapter();
+          feedAdapter.setPosts(posts);
+          feedAdapter.updateItems(true);
+        }
+      }
+    };
+    drawerLayout.setDrawerListener(mDrawerToggle);
   }
 
   @Override

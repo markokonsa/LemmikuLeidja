@@ -4,13 +4,13 @@
                 android:id="@+id/root"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".MainActivity">
-
+                tools:context=".FeedActivity">
     <android.support.design.widget.CoordinatorLayout
             android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
+
 
         <android.support.v7.widget.RecyclerView
                 android:id="@+id/rvFeed"
@@ -19,15 +19,16 @@
                 android:scrollbars="none"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-        <android.support.design.widget.AppBarLayout
-                android:id="@+id/appBarLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <android.support.design.widget.AppBarLayout
+                    android:id="@+id/appBarLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
-            <include
-                    android:id="@+id/toolbar"
-                    layout="@layout/view_feed_toolbar" />
-        </android.support.design.widget.AppBarLayout>
+                <include
+                        android:id="@+id/toolbar"
+                        layout="@layout/view_feed_toolbar" />
+
+            </android.support.design.widget.AppBarLayout>
 
         <android.support.design.widget.FloatingActionButton
                 android:id="@+id/btnCreate"
@@ -40,7 +41,5 @@
                 app:borderWidth="0dp"
                 app:elevation="6dp"
                 app:pressedTranslationZ="12dp" />
-
     </android.support.design.widget.CoordinatorLayout>
-
 </RelativeLayout>

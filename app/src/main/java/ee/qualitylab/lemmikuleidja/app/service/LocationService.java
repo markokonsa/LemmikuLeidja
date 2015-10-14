@@ -33,8 +33,26 @@ public class LocationService {
         addresses = null;
       }
     }
-    return addresses.get(0);
+    if (addresses != null && addresses.size()>0) {
+      return addresses.get(0);
+    }else {
+      return null;
+    }
   }
 
+  public Address getLocationFromString(String location) {
+    Geocoder geocoder = new Geocoder(context);
+    List<Address> addresses;
+    try {
+      addresses = geocoder.getFromLocationName(location, 1);
+    } catch (IOException e) {
+      addresses = null;
+    }
+    if (addresses != null && addresses.size()>0) {
+      return addresses.get(0);
+    }else {
+      return null;
+    }
+  }
 
 }
