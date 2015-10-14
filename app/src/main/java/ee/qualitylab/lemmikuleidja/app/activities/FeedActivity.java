@@ -22,20 +22,19 @@ import ee.qualitylab.lemmikuleidja.app.objects.Post;
 import ee.qualitylab.lemmikuleidja.app.service.LocationService;
 import ee.qualitylab.lemmikuleidja.app.service.PostService;
 import ee.qualitylab.lemmikuleidja.app.utilities.Utils;
-import ee.qualitylab.lemmikuleidja.app.view.FeedContextMenu;
 import ee.qualitylab.lemmikuleidja.app.view.FeedContextMenuManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class FeedActivity extends BaseDrawerActivity implements FeedAdapter.OnFeedItemClickListener,
-        FeedContextMenu.OnFeedContextMenuItemClickListener {
+public class FeedActivity extends BaseDrawerActivity {
   public static final String ACTION_SHOW_LOADING_ITEM = "action_show_loading_item";
 
   private static final int ANIM_DURATION_TOOLBAR = 300;
   private static final int ANIM_DURATION_FAB = 400;
   public static boolean progressAnimating = false;
+  private String locationText = "";
 
   @InjectView(R.id.rvFeed)
   RecyclerView rvFeed;
@@ -76,7 +75,7 @@ public class FeedActivity extends BaseDrawerActivity implements FeedAdapter.OnFe
     locationService = new LocationService(this);
     posts = new ArrayList<>();
 
-    if (!addAddressET.getText().toString().equals("") || locationService.getLocationFromString(addAddressET.getText().toString()) != null){
+    if (!addAddressET.getText().toString().equals("") || locationService.getLocationFromString(addAddressET.getText().toString()) != null) {
       posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()));
     }
 
@@ -158,44 +157,21 @@ public class FeedActivity extends BaseDrawerActivity implements FeedAdapter.OnFe
       public void onDrawerClosed(View drawerView) {
         super.onDrawerClosed(drawerView);
         boolean location = locationService.getLocationFromString(addAddressET.getText().toString()) == null;
-
-        if (addAddressET.getText().toString().equals("") || location) {
-          drawerLayout.openDrawer(Gravity.LEFT);
-          addAddressET.setTextColor(Color.RED);
-        } else {
-          posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()));
-          feedAdapter.clearAdapter();
-          feedAdapter.setPosts(posts);
-          feedAdapter.updateItems(true);
+        if (!locationText.equals(addAddressET.getText().toString()) && !addAddressET.getText().toString().equals("")) {
+          if (addAddressET.getText().toString().equals("") || location) {
+              drawerLayout.openDrawer(Gravity.LEFT);
+              addAddressET.setTextColor(Color.RED);
+          } else {
+              posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()));
+              locationText = addAddressET.getText().toString();
+              feedAdapter.clearAdapter();
+              feedAdapter.setPosts(posts);
+              feedAdapter.updateItems(true);
+          }
         }
       }
     };
     drawerLayout.setDrawerListener(mDrawerToggle);
-  }
-
-  @Override
-  public void onMoreClick(View v, int itemPosition) {
-    FeedContextMenuManager.getInstance().toggleContextMenuFromView(v, itemPosition, this);
-  }
-
-  @Override
-  public void onReportClick(int feedItem) {
-    FeedContextMenuManager.getInstance().hideContextMenu();
-  }
-
-  @Override
-  public void onSharePhotoClick(int feedItem) {
-    FeedContextMenuManager.getInstance().hideContextMenu();
-  }
-
-  @Override
-  public void onCopyShareUrlClick(int feedItem) {
-    FeedContextMenuManager.getInstance().hideContextMenu();
-  }
-
-  @Override
-  public void onCancelClick(int feedItem) {
-    FeedContextMenuManager.getInstance().hideContextMenu();
   }
 
   @OnClick(R.id.btnCreate)

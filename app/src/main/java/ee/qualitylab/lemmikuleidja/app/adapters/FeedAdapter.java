@@ -22,10 +22,9 @@ import ee.qualitylab.lemmikuleidja.app.view.SendingProgressView;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements View.OnClickListener {
+public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>  {
   private static final int VIEW_TYPE_DEFAULT = 1;
   private static final int VIEW_TYPE_LOADER = 2;
-  private static final int VIEW_TYPE_UPDATE = 3;
 
   private Context context;
   private int lastAnimatedPosition = -1;
@@ -52,9 +51,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
   public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     final View view = LayoutInflater.from(context).inflate(R.layout.item_feed, parent, false);
     final CellFeedViewHolder cellFeedViewHolder = new CellFeedViewHolder(view);
-    if (viewType == VIEW_TYPE_DEFAULT) {
-      cellFeedViewHolder.ivFeedCenter.setOnClickListener(this);
-    } else if (viewType == VIEW_TYPE_LOADER) {
+    if (viewType == VIEW_TYPE_LOADER) {
       View bgView = new View(context);
       bgView.setLayoutParams(new FrameLayout.LayoutParams(
               ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
@@ -95,7 +92,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
   public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
     runEnterAnimation(viewHolder.itemView, position);
     final CellFeedViewHolder holder = (CellFeedViewHolder) viewHolder;
-    if (getItemViewType(position) == VIEW_TYPE_DEFAULT) {
+    if (getItemViewType(position) != VIEW_TYPE_LOADER) {
       bindDefaultFeedItem(position, holder);
     } else if (getItemViewType(position) == VIEW_TYPE_LOADER) {
       bindLoadingFeedItem(holder);
@@ -109,8 +106,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
       holder.dateTextView.setText(format.format(posts.get(position).getTime()));
       holder.locationTextView.setText(posts.get(position).getAddress() + ", " + posts.get(position).getCity() + ", " + posts.get(position).getCountry());
       holder.feedDescriptionTextView.setText(posts.get(position).getDescription());
-
-      holder.ivFeedCenter.setTag(holder);
   }
 
   private void bindLoadingFeedItem(final CellFeedViewHolder holder) {
@@ -168,14 +163,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
   }
 
 
-  @Override
-  public void onClick(View view) {
-    final int viewId = view.getId();
-    if (viewId == R.id.ivFeedCenter) {
-      CellFeedViewHolder holder = (CellFeedViewHolder) view.getTag();
 
-    }
-  }
 
 
   public void updateItems(boolean animated) {
@@ -208,11 +196,5 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
       super(view);
       ButterKnife.inject(this, view);
     }
-  }
-
-
-  public interface OnFeedItemClickListener {
-
-    public void onMoreClick(View v, int position);
   }
 }
