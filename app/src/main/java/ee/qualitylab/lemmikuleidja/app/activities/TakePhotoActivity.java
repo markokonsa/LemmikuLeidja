@@ -8,12 +8,15 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
@@ -183,6 +186,39 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
   public CameraHost getCameraHost() {
     return new MyCameraHost(this);
   }
+
+  public void openGallery(View view) {
+    Intent i = new Intent(Intent.ACTION_PICK,
+            android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+    final int ACTIVITY_SELECT_IMAGE = 1234;
+    startActivityForResult(i, ACTIVITY_SELECT_IMAGE);
+  }
+
+  protected void onActivityResult(int requestCode, int resultCode, Intent data)
+  {
+    super.onActivityResult(requestCode, resultCode, data);
+
+    switch(requestCode) {
+      case 1234:
+        if(resultCode == RESULT_OK){
+          Uri selectedImage = data.getData();
+          String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+          Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+          cursor.moveToFirst();
+
+          int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+          String filePath = cursor.getString(columnIndex);
+          cursor.close();
+
+
+          Bitmap yourSelectedImage = BitmapFactory.decodeFile(filePath);
+          photoPath = new File(filePath);
+          showTakenPicture(yourSelectedImage);
+        }
+    }
+
+  };
 
   class MyCameraHost extends SimpleCameraHost {
 

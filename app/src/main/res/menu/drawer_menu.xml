@@ -1,21 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/menu_group_1">
+    <group android:id="@+id/menu_group_cities">
         <item
-                android:id="@+id/menu_feed"
-                android:title="Tallinn" />
+            android:id="@+id/menu_tallinn"
+            android:onClick="onCityItemClick"
+            android:title="Tallinn" />
         <item
-                android:id="@+id/menu_direct"
-                android:title="Tartu" />
+            android:id="@+id/menu_tartu"
+            android:onClick="onCityItemClick"
+            android:title="Tartu" />
         <item
-                android:id="@+id/menu_news"
-                android:title="Pärnu" />
-    </group>
-    <group android:id="@+id/menu_group_2">
-        <item
-                android:id="@+id/menu_settings"
-                android:title="Seaded" />
-        <item
-                android:id="@+id/menu_about"
-                android:title="Meist" />
+            android:id="@+id/menu_parnu"
+            android:onClick="onCityItemClick"
+            android:title="Pärnu" />
     </group>
 </menu>

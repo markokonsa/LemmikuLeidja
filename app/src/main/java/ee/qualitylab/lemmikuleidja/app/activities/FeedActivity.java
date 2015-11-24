@@ -2,6 +2,7 @@ package ee.qualitylab.lemmikuleidja.app.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,6 +15,11 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
+import android.view.inputmethod.InputMethodManager;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.InjectView;
 import butterknife.OnClick;
 import ee.qualitylab.lemmikuleidja.app.R;
@@ -23,9 +29,6 @@ import ee.qualitylab.lemmikuleidja.app.service.LocationService;
 import ee.qualitylab.lemmikuleidja.app.service.PostService;
 import ee.qualitylab.lemmikuleidja.app.utilities.Utils;
 import ee.qualitylab.lemmikuleidja.app.view.FeedContextMenuManager;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class FeedActivity extends BaseDrawerActivity {
@@ -156,13 +159,16 @@ public class FeedActivity extends BaseDrawerActivity {
       @Override
       public void onDrawerClosed(View drawerView) {
         super.onDrawerClosed(drawerView);
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(drawerView.getWindowToken(), 0);
         boolean location = locationService.getLocationFromString(addAddressET.getText().toString()) == null;
         if (!locationText.equals(addAddressET.getText().toString()) && !addAddressET.getText().toString().equals("")) {
           if (addAddressET.getText().toString().equals("") || location) {
               drawerLayout.openDrawer(Gravity.LEFT);
               addAddressET.setTextColor(Color.RED);
           } else {
-              posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()));
+            addAddressET.setTextColor(Color.GREEN);
+               posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()));
               locationText = addAddressET.getText().toString();
               feedAdapter.clearAdapter();
               feedAdapter.setPosts(posts);
