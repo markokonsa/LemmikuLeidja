@@ -16,6 +16,8 @@ import ee.qualitylab.lemmikuleidja.app.service.LocationService;
 
 public class BaseDrawerActivity extends BaseActivity {
 
+    public static boolean enteredByHand = false;
+
     @InjectView(R.id.drawerLayout)
     DrawerLayout drawerLayout;
 
@@ -81,6 +83,7 @@ public class BaseDrawerActivity extends BaseActivity {
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     if (!addAddressET.getText().toString().equals("")) {
+                        enteredByHand = true;
                         try {
                             Address address = locationService.getLocationFromString(addAddressET.getText().toString());
                             addAddressET.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
@@ -96,6 +99,7 @@ public class BaseDrawerActivity extends BaseActivity {
     }
 
     public void onCityItemClick(MenuItem item) {
+        enteredByHand = false;
         Address address = locationService.getLocationFromString(item.getTitle().toString());
         addAddressET.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
         addAddressET.setTextColor(Color.GREEN);
