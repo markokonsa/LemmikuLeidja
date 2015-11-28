@@ -211,7 +211,6 @@ public class TakePhotoActivity extends BaseActivity implements RevealBackgroundV
           String filePath = cursor.getString(columnIndex);
           cursor.close();
 
-
           Bitmap yourSelectedImage = BitmapFactory.decodeFile(filePath);
           photoPath = new File(filePath);
           showTakenPicture(yourSelectedImage);
