@@ -6,8 +6,19 @@ Projekti eesmärk on kasutada ära mobiilirakenduse võimalusi ja lemmikuleidja 
 
 <h2>Kasutusjuhend</h2>
 
-<b></b>
-<b></b>
-<b></b>
-<b></b>
-<b></b><b></b>
+<b>Registreerimine kasutajaks</b>
+Eraldi kasutajaks pole vaja registreeruda. Süsteem teeb seda automaatselt esmakordsel sisselogimisel, kasutades mobiili unikaalset ID.
+
+<b>Postituse lisamine</b>
+Postituse lisamiseks tuleb vajutada kaamera nupule (asub ekraani alumises osas, esilehel)
+Teha pilt või valida vastav pilt galleriist.
+Sisestada pealkiri ja asukoht (kui asukoha määramine pole sisselülitatud telefonis).
+
+<b>Postituste kuvamine</b>
+Kasutajale kuvatakse ainult postitusi mis asuvad tema soovitud piirkonnas. Kui kasutajal on asukohamääramine sisselülitatud, siis võtab süsteem selle automaatselt, ning kuvab 15 km raadiuses tehtud postitusi. Kui kasutajal pole määratud asukoht, siis tuleb see postituste nägemiseks valida või sisestada.
+
+
+<h2>Installeerimine</h2>
+
+<b>Demo versiooni .apk</b>
+https://www.dropbox.com/s/1c1frhq8ra8zbiu/lemmikuleidja.apk?dl=0
