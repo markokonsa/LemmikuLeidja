@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Address;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +16,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +44,8 @@ public class FeedActivity extends BaseDrawerActivity {
     RecyclerView rvFeed;
     @InjectView(R.id.btnCreate)
     FloatingActionButton fabCreate;
+    @InjectView(R.id.errorText)
+    TextView errorText;
 
     private PostService postService;
     private LocationService locationService;
@@ -80,9 +82,14 @@ public class FeedActivity extends BaseDrawerActivity {
         posts = new ArrayList<>();
 
         if (!addAddressET.getText().toString().equals("") || locationService.getLocationFromString(addAddressET.getText().toString()) != null) {
+            Utils.showProgressIndicator(this, "Palun oodake...");
             posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);
         }
-
+        if (posts.isEmpty()){
+            errorText.setVisibility(View.VISIBLE);
+        }else {
+            errorText.setVisibility(View.GONE);
+        }
         feedAdapter = new FeedAdapter(this, posts);
         rvFeed.setAdapter(feedAdapter);
         rvFeed.setOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -113,6 +120,7 @@ public class FeedActivity extends BaseDrawerActivity {
                 feedAdapter.showLoadingView();
             }
         }, 500);
+        feedAdapter.updateItems(true);
     }
 
     @Override
@@ -127,9 +135,6 @@ public class FeedActivity extends BaseDrawerActivity {
 
     private void startIntroAnimation() {
         fabCreate.setTranslationY(2 * getResources().getDimensionPixelOffset(R.dimen.btn_fab_size));
-
-        int actionbarSize = Utils.dpToPx(56);
-        getToolbar().setTranslationY(-actionbarSize);
         getToolbar().animate()
                 .translationY(0)
                 .setDuration(ANIM_DURATION_TOOLBAR)
@@ -149,6 +154,12 @@ public class FeedActivity extends BaseDrawerActivity {
                 .setInterpolator(new OvershootInterpolator(1.f))
                 .setStartDelay(300)
                 .setDuration(ANIM_DURATION_FAB)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        Utils.cancelProgressIndicator();
+                    }
+                })
                 .start();
         feedAdapter.updateItems(true);
     }
@@ -171,12 +182,18 @@ public class FeedActivity extends BaseDrawerActivity {
                         drawerLayout.openDrawer(Gravity.LEFT);
                         addAddressET.setTextColor(Color.RED);
                     } else {
+                        Utils.showProgressIndicator(FeedActivity.this, "Palun oodake...");
                         addAddressET.setTextColor(Color.GREEN);
                         posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);
                         feedAdapter.clearAdapter();
                         feedAdapter.setPosts(posts);
                         startIntroAnimation();
-
+                        if (posts.isEmpty()){
+                            errorText.setVisibility(View.VISIBLE);
+                        }else {
+                            errorText.setVisibility(View.GONE);
+                            rvFeed.smoothScrollToPosition(0);
+                        }
                     }
                 }
             }

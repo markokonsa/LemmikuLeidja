@@ -113,10 +113,12 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             public boolean onPreDraw() {
                 imageView.getViewTreeObserver().removeOnPreDrawListener(this);
                 Bitmap original = posts.get(position).getPicBitmap();
-                int targetWidth = imageView.getMeasuredWidth();
-                int targetHeight = imageView.getMeasuredHeight();
-                Bitmap decoded = Bitmap.createScaledBitmap(original, targetWidth, targetHeight, false);
-                imageView.setImageBitmap(decoded);
+                if (original != null) {
+                    int targetWidth = imageView.getMeasuredWidth();
+                    int targetHeight = imageView.getMeasuredHeight();
+                    Bitmap decoded = Bitmap.createScaledBitmap(original, targetWidth, targetHeight, false);
+                    imageView.setImageBitmap(decoded);
+                }
                 return true;
             }
         });
