@@ -29,7 +29,6 @@ import ee.qualitylab.lemmikuleidja.app.objects.Post;
 import ee.qualitylab.lemmikuleidja.app.service.LocationService;
 import ee.qualitylab.lemmikuleidja.app.service.PostService;
 import ee.qualitylab.lemmikuleidja.app.utilities.Utils;
-import ee.qualitylab.lemmikuleidja.app.view.FeedContextMenuManager;
 
 
 public class FeedActivity extends BaseDrawerActivity {
@@ -92,12 +91,7 @@ public class FeedActivity extends BaseDrawerActivity {
         }
         feedAdapter = new FeedAdapter(this, posts);
         rvFeed.setAdapter(feedAdapter);
-        rvFeed.setOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                FeedContextMenuManager.getInstance().onScrolled(recyclerView, dx, dy);
-            }
-        });
+
     }
 
     @Override
