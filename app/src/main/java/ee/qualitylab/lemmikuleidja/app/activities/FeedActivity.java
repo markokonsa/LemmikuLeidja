@@ -180,6 +180,7 @@ public class FeedActivity extends BaseDrawerActivity {
                         addAddressET.setTextColor(Color.GREEN);
                         posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);
                         feedAdapter.clearAdapter();
+                        feedAdapter.notifyDataSetChanged();
                         feedAdapter.setPosts(posts);
                         startIntroAnimation();
                         if (posts.isEmpty()){
