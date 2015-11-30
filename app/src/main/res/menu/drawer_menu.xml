@@ -13,4 +13,10 @@
             android:onClick="onCityItemClick"
             android:title="Pärnu" />
     </group>
+    <group android:id="@+id/menu_group_settings">
+        <item
+            android:id="@+id/menu_settings"
+            android:onClick="onSettingsClick"
+            android:title="Seaded" />
+    </group>
 </menu>

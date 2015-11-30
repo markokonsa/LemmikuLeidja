@@ -81,7 +81,7 @@ public class Lemmikuleidja extends Application {
     public static String getDataFromIntent(Intent intent) {
         String city = null;
         try {
-            if (intent.getExtras() != null) {
+            if (intent.getExtras() != null && intent.getExtras().getString(PARSE_DATA_KEY) != null) {
                 JSONObject data = new JSONObject(intent.getExtras().getString(PARSE_DATA_KEY));
                 city = data.get("city").toString();
             }

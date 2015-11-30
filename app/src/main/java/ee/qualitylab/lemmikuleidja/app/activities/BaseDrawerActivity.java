@@ -1,5 +1,6 @@
 package ee.qualitylab.lemmikuleidja.app.activities;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
 import android.support.v4.widget.DrawerLayout;
@@ -112,5 +113,10 @@ public class BaseDrawerActivity extends BaseActivity {
         Address address = locationService.getLocationFromString(item.getTitle().toString());
         addAddressET.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
         addAddressET.setTextColor(Color.GREEN);
+    }
+
+    public void onSettingsClick(MenuItem item) {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 }
