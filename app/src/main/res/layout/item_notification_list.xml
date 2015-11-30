@@ -4,15 +4,7 @@
     android:layout_height="match_parent"
     android:padding="20dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Medium Text"
-        android:id="@+id/notificationCityName"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+
 
     <Switch
         android:layout_width="wrap_content"
@@ -21,6 +13,8 @@
         android:layout_alignTop="@+id/notificationCityName"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:onClick="SettingsSwitchOnClick"
-        android:checked="true" />
+        android:text="Cityname"
+        android:checked="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>

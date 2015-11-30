@@ -113,6 +113,7 @@ public class BaseDrawerActivity extends BaseActivity {
         Address address = locationService.getLocationFromString(item.getTitle().toString());
         addAddressET.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
         addAddressET.setTextColor(Color.GREEN);
+        drawerLayout.closeDrawer(Gravity.LEFT);
     }
 
     public void onSettingsClick(MenuItem item) {
