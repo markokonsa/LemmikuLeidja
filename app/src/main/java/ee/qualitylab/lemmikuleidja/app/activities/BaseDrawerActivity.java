@@ -104,5 +104,4 @@ public class BaseDrawerActivity extends BaseActivity {
         addAddressET.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
         addAddressET.setTextColor(Color.GREEN);
     }
-
 }

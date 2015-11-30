@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "LemmikuLeidja": {
+      "applicationId": "tX1mrowGfe2zCN1r2D6XvNCujzpLIPnRfsAp9qBs"
+    },
+    "_default": {
+      "link": "LemmikuLeidja"
+    }
+  }
+}

@@ -13,21 +13,26 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
+import butterknife.Optional;
 import ee.qualitylab.lemmikuleidja.app.R;
 import ee.qualitylab.lemmikuleidja.app.adapters.FeedAdapter;
 import ee.qualitylab.lemmikuleidja.app.objects.Post;
 import ee.qualitylab.lemmikuleidja.app.service.LocationService;
 import ee.qualitylab.lemmikuleidja.app.service.PostService;
+import ee.qualitylab.lemmikuleidja.app.utilities.Lemmikuleidja;
 import ee.qualitylab.lemmikuleidja.app.utilities.Utils;
 
 
@@ -36,7 +41,6 @@ public class FeedActivity extends BaseDrawerActivity {
 
     private static final int ANIM_DURATION_TOOLBAR = 300;
     private static final int ANIM_DURATION_FAB = 400;
-    public static boolean progressAnimating = false;
     private String locationText = "";
 
     @InjectView(R.id.rvFeed)
@@ -45,6 +49,8 @@ public class FeedActivity extends BaseDrawerActivity {
     FloatingActionButton fabCreate;
     @InjectView(R.id.errorText)
     TextView errorText;
+
+    Menu mainMenu;
 
     private PostService postService;
     private LocationService locationService;
@@ -81,12 +87,13 @@ public class FeedActivity extends BaseDrawerActivity {
         posts = new ArrayList<>();
 
         if (!addAddressET.getText().toString().equals("") || locationService.getLocationFromString(addAddressET.getText().toString()) != null) {
+            setupNotificationIcon(getCityFromAddress());
             Utils.showProgressIndicator(this, "Palun oodake...");
             posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);
         }
-        if (posts.isEmpty()){
+        if (posts.isEmpty()) {
             errorText.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             errorText.setVisibility(View.GONE);
         }
         feedAdapter = new FeedAdapter(this, posts);
@@ -106,6 +113,23 @@ public class FeedActivity extends BaseDrawerActivity {
         }
     }
 
+    public void onNotificationClick(MenuItem item) {
+        String title = item.getTitle().toString();
+        String city = getCityFromAddress();
+        if (!city.isEmpty()) {
+            if (title.equals("OFF")) {
+                item.setTitle("ON");
+                Lemmikuleidja.subscribe(city);
+                Toast.makeText(this, "Teated on sisselülitatud linnale: " + city, Toast.LENGTH_SHORT).show();
+
+            } else {
+                item.setTitle("OFF");
+                Lemmikuleidja.unsubscribe(city);
+                Toast.makeText(this, "Teated on välja lülitatud linnast: " + city, Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void showFeedLoadingItemDelayed() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -119,7 +143,9 @@ public class FeedActivity extends BaseDrawerActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        mainMenu = menu;
         if (pendingIntroAnimation) {
             pendingIntroAnimation = false;
             startIntroAnimation();
@@ -176,6 +202,7 @@ public class FeedActivity extends BaseDrawerActivity {
                         drawerLayout.openDrawer(Gravity.LEFT);
                         addAddressET.setTextColor(Color.RED);
                     } else {
+                        setupNotificationIcon(getCityFromAddress());
                         Utils.showProgressIndicator(FeedActivity.this, "Palun oodake...");
                         addAddressET.setTextColor(Color.GREEN);
                         posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);
@@ -183,9 +210,9 @@ public class FeedActivity extends BaseDrawerActivity {
                         feedAdapter.notifyDataSetChanged();
                         feedAdapter.setPosts(posts);
                         startIntroAnimation();
-                        if (posts.isEmpty()){
+                        if (posts.isEmpty()) {
                             errorText.setVisibility(View.VISIBLE);
-                        }else {
+                        } else {
                             errorText.setVisibility(View.GONE);
                             rvFeed.smoothScrollToPosition(0);
                         }
@@ -205,5 +232,25 @@ public class FeedActivity extends BaseDrawerActivity {
         overridePendingTransition(0, 0);
     }
 
+    private String getCityFromAddress() {
+        String city = "";
+        if (locationService.getLocationFromString(addAddressET.getText().toString()) != null) {
 
+            if (locationService.getLocationFromString(addAddressET.getText().toString()).getLocality() != null) {
+                city = locationService.getLocationFromString(addAddressET.getText().toString()).getLocality();
+            } else {
+                city = locationService.getLocationFromString(addAddressET.getText().toString()).getSubAdminArea();
+            }
+        }
+        return city;
+    }
+
+    private void setupNotificationIcon(String city) {
+        MenuItem item = mainMenu.findItem(R.id.action_notification);
+        if (Lemmikuleidja.subscribedChannels.contains(city) && !city.isEmpty()) {
+            item.setTitle("ON");
+        } else {
+            item.setTitle("OFF");
+        }
+    }
 }
