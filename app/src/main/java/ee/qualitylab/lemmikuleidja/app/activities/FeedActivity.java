@@ -209,6 +209,7 @@ public class FeedActivity extends BaseDrawerActivity {
                         feedAdapter.notifyDataSetChanged();
                         feedAdapter.setPosts(posts);
                         startIntroAnimation();
+                        setupNotificationIcon(getCityFromAddress());
                         if (posts.isEmpty()) {
                             errorText.setVisibility(View.VISIBLE);
                         } else {
