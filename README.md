@@ -17,6 +17,10 @@ Sisestada pealkiri ja asukoht (kui asukoha määramine pole sisselülitatud tele
 <b>Postituste kuvamine</b></br>
 Kasutajale kuvatakse ainult postitusi mis asuvad tema soovitud piirkonnas. Kui kasutajal on asukohamääramine sisselülitatud, siis võtab süsteem selle automaatselt, ning kuvab 15 km raadiuses tehtud postitusi. Kui kasutajal pole määratud asukoht, siis tuleb see postituste nägemiseks valida või sisestada.
 
+<b>Teadete kuvamine</b></br>
+Kasutajal on võimalik lülitada sisse "push notificatid" ehk teated. Selleks peab kasutaja vastava linna vaates vajutama ekraani üleval paremal servas olevat nuppu. Seejärel lülitatakse taustal sisse sellele linnale teated, mis tähendab, et igakord kui keegi postitab midagi antud linna tuleb teade ka kasutajale. Teate välja lülitamiseks tuleb kasutajal uuesti vajutada nuppu.
+
+
 
 <h2>Installeerimine</h2>
 
