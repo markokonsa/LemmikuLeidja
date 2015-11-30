@@ -26,7 +26,6 @@ import java.util.List;
 
 import butterknife.InjectView;
 import butterknife.OnClick;
-import butterknife.Optional;
 import ee.qualitylab.lemmikuleidja.app.R;
 import ee.qualitylab.lemmikuleidja.app.adapters.FeedAdapter;
 import ee.qualitylab.lemmikuleidja.app.objects.Post;
@@ -87,7 +86,6 @@ public class FeedActivity extends BaseDrawerActivity {
         posts = new ArrayList<>();
 
         if (!addAddressET.getText().toString().equals("") || locationService.getLocationFromString(addAddressET.getText().toString()) != null) {
-            setupNotificationIcon(getCityFromAddress());
             Utils.showProgressIndicator(this, "Palun oodake...");
             posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);
         }
@@ -149,6 +147,7 @@ public class FeedActivity extends BaseDrawerActivity {
         if (pendingIntroAnimation) {
             pendingIntroAnimation = false;
             startIntroAnimation();
+            setupNotificationIcon(getCityFromAddress());
         }
         return true;
     }
@@ -198,11 +197,11 @@ public class FeedActivity extends BaseDrawerActivity {
                 imm.hideSoftInputFromWindow(drawerView.getWindowToken(), 0);
                 boolean location = locationService.getLocationFromString(addAddressET.getText().toString()) == null;
                 if (!locationText.equals(addAddressET.getText().toString()) && !addAddressET.getText().toString().equals("")) {
-                    if (addAddressET.getText().toString().equals("") || location) {
+                    if (addAddressET.getText().toString().isEmpty() || location) {
                         drawerLayout.openDrawer(Gravity.LEFT);
                         addAddressET.setTextColor(Color.RED);
                     } else {
-                        setupNotificationIcon(getCityFromAddress());
+                        drawerLayout.closeDrawer(Gravity.LEFT);
                         Utils.showProgressIndicator(FeedActivity.this, "Palun oodake...");
                         addAddressET.setTextColor(Color.GREEN);
                         posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);

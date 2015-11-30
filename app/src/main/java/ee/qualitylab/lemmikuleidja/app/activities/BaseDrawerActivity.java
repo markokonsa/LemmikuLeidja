@@ -13,6 +13,7 @@ import android.widget.TextView;
 import butterknife.InjectView;
 import ee.qualitylab.lemmikuleidja.app.R;
 import ee.qualitylab.lemmikuleidja.app.service.LocationService;
+import ee.qualitylab.lemmikuleidja.app.utilities.Lemmikuleidja;
 
 public class BaseDrawerActivity extends BaseActivity {
 
@@ -25,6 +26,7 @@ public class BaseDrawerActivity extends BaseActivity {
     EditText addAddressET;
 
     LocationService locationService;
+    private String city;
 
     @Override
     public void setContentView(int layoutResID) {
@@ -40,12 +42,19 @@ public class BaseDrawerActivity extends BaseActivity {
         super.setupToolbar();
         if (getToolbar() != null) {
 
-            if (locationService.canGetLocation()) {
-                Address address = locationService.getLocation();
-                addAddressET.setText(address.getAddressLine(0));
-                addAddressET.setTextColor(Color.GREEN);
-            }
+           city = Lemmikuleidja.getDataFromIntent(this.getIntent());
 
+            if (city != null) {
+                Address address = locationService.getLocationFromString(city);
+                addAddressET.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
+                addAddressET.setTextColor(Color.GREEN);
+            } else {
+                if (locationService.canGetLocation()) {
+                    Address address = locationService.getLocation();
+                    addAddressET.setText(address.getAddressLine(0));
+                    addAddressET.setTextColor(Color.GREEN);
+                }
+            }
             addAddressET.addTextChangedListener(new TextWatcher() {
 
                 @Override

@@ -9,6 +9,7 @@ Parse.Cloud.afterSave("Posts",function(request){
                 			where: query,
                 			data: 
                       {
+                      		city: city,
                  			  alert: "Linna "+city+" lisati uus postitus"
                				}
               			}, 

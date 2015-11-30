@@ -2,12 +2,19 @@ package ee.qualitylab.lemmikuleidja.app.utilities;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.telephony.TelephonyManager;
+import android.widget.Toast;
 
 import com.parse.*;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import ee.qualitylab.lemmikuleidja.app.activities.FeedActivity;
 
 import static com.parse.Parse.initialize;
 import static com.parse.ParseInstallation.*;
@@ -16,6 +23,8 @@ public class Lemmikuleidja extends Application {
 
     public static ParseUser currentUser;
     public static List<String> subscribedChannels = new ArrayList<>();
+    public static final String PARSE_DATA_KEY = "com.parse.Data";
+
 
     @Override
     public void onCreate() {
@@ -67,6 +76,19 @@ public class Lemmikuleidja extends Application {
     private String getDeviceUuid() {
         TelephonyManager tManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         return tManager.getDeviceId();
+    }
+
+    public static String getDataFromIntent(Intent intent) {
+        String city = null;
+        try {
+            if (intent.getExtras() != null) {
+                JSONObject data = new JSONObject(intent.getExtras().getString(PARSE_DATA_KEY));
+                city = data.get("city").toString();
+            }
+        } catch (JSONException e) {
+            // Json was not readable...
+        }
+        return city;
     }
 
 }
