@@ -25,4 +25,8 @@ Kasutajal on võimalik lülitada sisse "push notificationid" ehk teated. Selleks
 <h2>Installeerimine</h2>
 
 <b>Demo versiooni .apk</b></br>
+
+<b>NB! Uue versiooni installeerimiseks kustutage vana telefonist ära ning laadige uus alla.</b>
+
+Viimati uuendatud 30.11.2015
 https://www.dropbox.com/s/1c1frhq8ra8zbiu/lemmikuleidja.apk?dl=0
