@@ -27,21 +27,6 @@ public class PostDao {
     this.context = context;
   }
 
-  public List<String> getPopularCities() throws ParseException {
-    ParseQuery<ParseObject> query = ParseQuery.getQuery(POSTS_TAG);
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(new Date());
-    cal.add(Calendar.DATE, -31);
-    query.whereGreaterThan("createdAt", cal.getTime());
-    List<String> cities = new ArrayList<>();
-    for (ParseObject object : query.find()){
-      if (!cities.contains(object.get(CITY_TAG).toString())) {
-        cities.add(object.get(CITY_TAG).toString());
-      }
-    }
-    return cities;
-  }
-
   public List<ParseObject> getPostsInLocality(String locality) throws ParseException {
     ParseQuery<ParseObject> query = ParseQuery.getQuery(POSTS_TAG);
     query.orderByDescending("createdAt");

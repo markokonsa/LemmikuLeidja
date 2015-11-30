@@ -16,7 +16,7 @@ public class SettingsActivity  extends ListActivity{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        SettingsAdapter adapter = new SettingsAdapter(this, Lemmikuleidja.subscribedChannels);
+        SettingsAdapter adapter = new SettingsAdapter(this, Lemmikuleidja.getSubscribedChannels());
         setListAdapter(adapter);
     }
 

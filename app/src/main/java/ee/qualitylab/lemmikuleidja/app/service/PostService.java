@@ -63,17 +63,13 @@ public class PostService {
     }
 
     private void getImageByteArray(final Post post) {
-        post.getPicture().getDataInBackground(new GetDataCallback() {
-
-            @Override
-            public void done(byte[] data, com.parse.ParseException e) {
-                if (e == null) {
-                    post.setPicBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
-                } else {
-                    post.setPicBitmap(null);
-                }
-            }
-        });
+        byte[] data = new byte[0];
+        try {
+            data = post.getPicture().getData();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        post.setPicBitmap(BitmapFactory.decodeByteArray(data, 0, data.length));
     }
 
     public void uploadPost(File photo, String location, String description) {

@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Address;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -40,7 +42,6 @@ public class FeedActivity extends BaseDrawerActivity {
 
     private static final int ANIM_DURATION_TOOLBAR = 300;
     private static final int ANIM_DURATION_FAB = 400;
-    private String locationText = "";
 
     @InjectView(R.id.rvFeed)
     RecyclerView rvFeed;
@@ -51,17 +52,19 @@ public class FeedActivity extends BaseDrawerActivity {
 
     Menu mainMenu;
 
-    private PostService postService;
     private LocationService locationService;
 
     private boolean pendingIntroAnimation;
     private FeedAdapter feedAdapter;
-    private List<Post> posts;
+    private List<Post> posts = new ArrayList<>();
+    private Address address;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feed);
+        feedAdapter = new FeedAdapter(this, posts);
+        rvFeed.setAdapter(feedAdapter);
         setupActionBarToggle();
         setupFeed();
 
@@ -81,22 +84,13 @@ public class FeedActivity extends BaseDrawerActivity {
             }
         };
         rvFeed.setLayoutManager(linearLayoutManager);
-        postService = new PostService(this);
         locationService = new LocationService(this);
         posts = new ArrayList<>();
+        address = locationService.getLocationFromString(addAddressET.getText().toString());
 
-        if (!addAddressET.getText().toString().equals("") || locationService.getLocationFromString(addAddressET.getText().toString()) != null) {
-            Utils.showProgressIndicator(this, "Palun oodake...");
-            posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);
+        if (!addAddressET.getText().toString().isEmpty() || address != null) {
+            execute();
         }
-        if (posts.isEmpty()) {
-            errorText.setVisibility(View.VISIBLE);
-        } else {
-            errorText.setVisibility(View.GONE);
-        }
-        feedAdapter = new FeedAdapter(this, posts);
-        rvFeed.setAdapter(feedAdapter);
-
     }
 
     @Override
@@ -104,8 +98,7 @@ public class FeedActivity extends BaseDrawerActivity {
         super.onNewIntent(intent);
         if (ACTION_SHOW_LOADING_ITEM.equals(intent.getAction())) {
             if (Post.lastlyAddedPost != null)
-                if (Post.lastlyAddedPost.getCity().equals(locationService.getLocationFromString(addAddressET.getText().toString()).getLocality()) ||
-                        Post.lastlyAddedPost.getCity().equals(locationService.getLocationFromString(addAddressET.getText().toString()).getSubAdminArea())) {
+                if (Post.lastlyAddedPost.getCity().equals(getCityFromAddress(address))) {
                     showFeedLoadingItemDelayed();
                 }
         }
@@ -113,7 +106,7 @@ public class FeedActivity extends BaseDrawerActivity {
 
     public void onNotificationClick(MenuItem item) {
         String title = item.getTitle().toString();
-        String city = getCityFromAddress();
+        String city = getCityFromAddress(address);
         if (!city.isEmpty()) {
             if (title.equals("OFF")) {
                 item.setTitle("ON");
@@ -147,7 +140,7 @@ public class FeedActivity extends BaseDrawerActivity {
         if (pendingIntroAnimation) {
             pendingIntroAnimation = false;
             startIntroAnimation();
-            setupNotificationIcon(getCityFromAddress());
+            setupNotificationIcon(getCityFromAddress(address));
         }
         return true;
     }
@@ -195,27 +188,17 @@ public class FeedActivity extends BaseDrawerActivity {
                 super.onDrawerClosed(drawerView);
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(drawerView.getWindowToken(), 0);
-                boolean location = locationService.getLocationFromString(addAddressET.getText().toString()) == null;
-                if (!locationText.equals(addAddressET.getText().toString()) && !addAddressET.getText().toString().equals("")) {
+                address = locationService.getLocationFromString(addAddressET.getText().toString());
+                boolean location = address == null;
+                if (!addAddressET.getText().toString().isEmpty()) {
                     if (addAddressET.getText().toString().isEmpty() || location) {
                         drawerLayout.openDrawer(Gravity.LEFT);
                         addAddressET.setTextColor(Color.RED);
                     } else {
                         drawerLayout.closeDrawer(Gravity.LEFT);
-                        Utils.showProgressIndicator(FeedActivity.this, "Palun oodake...");
                         addAddressET.setTextColor(Color.GREEN);
-                        posts = postService.generateFeed(locationService.getLocationFromString(addAddressET.getText().toString()), BaseDrawerActivity.enteredByHand);
-                        feedAdapter.clearAdapter();
-                        feedAdapter.notifyDataSetChanged();
-                        feedAdapter.setPosts(posts);
-                        startIntroAnimation();
-                        setupNotificationIcon(getCityFromAddress());
-                        if (posts.isEmpty()) {
-                            errorText.setVisibility(View.VISIBLE);
-                        } else {
-                            errorText.setVisibility(View.GONE);
-                            rvFeed.smoothScrollToPosition(0);
-                        }
+
+                        execute();
                     }
                 }
             }
@@ -232,25 +215,61 @@ public class FeedActivity extends BaseDrawerActivity {
         overridePendingTransition(0, 0);
     }
 
-    private String getCityFromAddress() {
+    private String getCityFromAddress(Address address) {
         String city = "";
-        if (locationService.getLocationFromString(addAddressET.getText().toString()) != null) {
-
-            if (locationService.getLocationFromString(addAddressET.getText().toString()).getLocality() != null) {
-                city = locationService.getLocationFromString(addAddressET.getText().toString()).getLocality();
+        if (address != null) {
+            if (address.getLocality() != null) {
+                city = address.getLocality();
             } else {
-                city = locationService.getLocationFromString(addAddressET.getText().toString()).getSubAdminArea();
+                city = address.getSubAdminArea();
             }
         }
         return city;
     }
 
+    private void execute(){
+        new PostsTask().cancel(true);
+        new PostsTask().execute(address);
+    }
+
     private void setupNotificationIcon(String city) {
         MenuItem item = mainMenu.findItem(R.id.action_notification);
-        if (Lemmikuleidja.subscribedChannels.contains(city) && !city.isEmpty()) {
-            item.setTitle("ON");
-        } else {
-            item.setTitle("OFF");
+        List<String> channels = Lemmikuleidja.getSubscribedChannels();
+        if (channels != null) {
+            if (channels.contains(city) && !city.isEmpty()) {
+                item.setTitle("ON");
+            } else {
+                item.setTitle("OFF");
+            }
+        }
+    }
+
+    public class PostsTask extends AsyncTask<Address, Void, List<Post>> {
+
+        @Override
+        protected void onPreExecute() {
+            Utils.showProgressIndicator(FeedActivity.this,"Palun oodake...");
+        }
+
+        @Override
+        protected List<Post> doInBackground(Address... addresses) {
+            PostService service = new PostService(FeedActivity.this);
+            return service.generateFeed(address, BaseDrawerActivity.enteredByHand);
+        }
+
+        @Override
+        protected void onPostExecute(List<Post> posts) {
+            feedAdapter.clearAdapter();
+            feedAdapter.notifyDataSetChanged();
+            feedAdapter.setPosts(posts);
+            startIntroAnimation();
+            setupNotificationIcon(getCityFromAddress(address));
+            if (posts.isEmpty()) {
+                errorText.setVisibility(View.VISIBLE);
+            } else {
+                errorText.setVisibility(View.GONE);
+                rvFeed.smoothScrollToPosition(0);
+            }
         }
     }
 }
