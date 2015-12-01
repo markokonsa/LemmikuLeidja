@@ -1,6 +1,6 @@
 Parse.Cloud.afterSave("Posts",function(request){
      
-     var city= request.object.get("city");
+     var city= removeSpecialCharacters(request.object.get("city"));
 
     var query = new Parse.Query(Parse.Installation);
     query.equalTo('channels', city);
@@ -20,6 +20,15 @@ Parse.Cloud.afterSave("Posts",function(request){
                	    }
             		});
 });
+
+function removeSpecialCharacters(string){
+	var finalString = string;
+	 finalString = finalString.replace("õ","o");
+	 finalString = finalString.replace("ä","a");
+	 finalString = finalString.replace("ö","o");
+	 finalString = finalString.replace("ü","u");
+	 return finalString;
+}
 
 
 
