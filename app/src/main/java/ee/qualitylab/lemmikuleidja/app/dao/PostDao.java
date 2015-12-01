@@ -30,6 +30,7 @@ public class PostDao {
   public List<ParseObject> getPostsInLocality(String locality) throws ParseException {
     ParseQuery<ParseObject> query = ParseQuery.getQuery(POSTS_TAG);
     query.orderByDescending("createdAt");
+    query.whereGreaterThan("createdAt",dateMinusTwoWeeks());
     query.whereEqualTo(CITY_TAG, locality);
     return query.find();
   }
@@ -37,6 +38,7 @@ public class PostDao {
   public List<ParseObject> getPostsInRadius(ParseGeoPoint current, double radius) throws ParseException {
     ParseQuery<ParseObject> query = ParseQuery.getQuery(POSTS_TAG);
     query.orderByDescending("createdAt");
+    query.whereGreaterThan("createdAt",dateMinusTwoWeeks());
     query.whereWithinKilometers(LOCATION_TAG, current, radius);
     return query.find();
   }
@@ -61,4 +63,11 @@ public class PostDao {
       }
     });
   }
+
+  private Date dateMinusTwoWeeks() {
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.DATE,-14);
+    return cal.getTime();
+  }
+
 }

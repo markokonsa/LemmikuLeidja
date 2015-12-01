@@ -1,16 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <include layout="@layout/view_feed_toolbar"
         android:id="@+id/include" />
 
+    <TextView
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:id="@+id/headerPostSettings"
+        android:text="Postituste seaded"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#757678"
+        android:layout_below="@+id/include"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/notification_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_above="@+id/settings_save_btn"
+        android:layout_below="@+id/radius_edittext" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Raadius"
+        android:id="@+id/textView"
+        android:paddingLeft="10dp"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-</LinearLayout>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:ems="10"
+        android:paddingRight="10dp"
+        android:id="@+id/radius_edittext"
+        android:layout_alignTop="@+id/textView"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Käsitsi sisestatud aadressi korral kuvatakse kasutajale selle aadressi raadiuses olevaid postitusi. Sisestage raadius, mille sees soovite, et postitusi kuvatakse."
+        android:id="@+id/textView2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/headerPostSettings"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Salvesta"
+        android:id="@+id/settings_save_btn"
+        android:onClick="saveSettings"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

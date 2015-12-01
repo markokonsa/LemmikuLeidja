@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.location.Address;
 import android.os.AsyncTask;
@@ -100,6 +101,8 @@ public class FeedActivity extends BaseDrawerActivity {
             if (Post.lastlyAddedPost != null)
                 if (Post.lastlyAddedPost.getCity().equals(getCityFromAddress(address))) {
                     showFeedLoadingItemDelayed();
+                }else {
+                    Toast.makeText(this, "Postitust laetakse ülesse linna: " + Post.lastlyAddedPost.getCity(), Toast.LENGTH_SHORT).show();
                 }
         }
     }
@@ -118,6 +121,8 @@ public class FeedActivity extends BaseDrawerActivity {
                 Lemmikuleidja.unsubscribe(city);
                 Toast.makeText(this, "Teated on välja lülitatud linnast: " + city, Toast.LENGTH_SHORT).show();
             }
+        }else {
+            Toast.makeText(this, "Enne teadete aktiveerimist valige linn, milles soovite aktiveerida.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -201,6 +206,14 @@ public class FeedActivity extends BaseDrawerActivity {
                         execute();
                     }
                 }
+                else {
+                    feedAdapter.clearAdapter();
+                    feedAdapter.notifyDataSetChanged();
+                    feedAdapter.setPosts(posts);
+                    startIntroAnimation();
+                    setupNotificationIcon(getCityFromAddress(address));
+                    errorText.setVisibility(View.VISIBLE);
+                }
             }
         };
         drawerLayout.setDrawerListener(mDrawerToggle);
@@ -253,7 +266,8 @@ public class FeedActivity extends BaseDrawerActivity {
 
         @Override
         protected List<Post> doInBackground(Address... addresses) {
-            PostService service = new PostService(FeedActivity.this);
+            SharedPreferences sharedPreferences = getSharedPreferences(Utils.MyPREFERENCES, Context.MODE_PRIVATE);
+            PostService service = new PostService(FeedActivity.this,sharedPreferences.getString("radius","15"));
             return service.generateFeed(address, BaseDrawerActivity.enteredByHand);
         }
 

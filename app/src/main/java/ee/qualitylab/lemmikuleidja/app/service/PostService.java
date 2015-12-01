@@ -1,6 +1,7 @@
 package ee.qualitylab.lemmikuleidja.app.service;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.location.Address;
 
@@ -8,6 +9,7 @@ import com.parse.*;
 
 import ee.qualitylab.lemmikuleidja.app.dao.PostDao;
 import ee.qualitylab.lemmikuleidja.app.objects.Post;
+import ee.qualitylab.lemmikuleidja.app.utilities.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +21,13 @@ public class PostService {
     PostDao dao;
     private Context context;
     private LocationService locationService;
+    private int radius;
+
+    public PostService(Context context, String radius) {
+        this.radius = Integer.valueOf(radius);
+        this.context = context;
+        this.locationService = new LocationService(context);
+    }
 
     public PostService(Context context) {
         this.context = context;
@@ -49,7 +58,7 @@ public class PostService {
             double latitude = address.getLatitude();
             double longitude = address.getLongitude();
             if (withRadius) {
-                return dao.getPostsInRadius(new ParseGeoPoint(latitude, longitude), 15);
+                return dao.getPostsInRadius(new ParseGeoPoint(latitude, longitude), radius);
             } else {
                 String locality;
                 if (address.getLocality() != null) locality = address.getLocality();

@@ -24,7 +24,6 @@ public class Lemmikuleidja extends Application {
     public static ParseUser currentUser;
     public static final String PARSE_DATA_KEY = "com.parse.Data";
 
-
     public static List<String> getSubscribedChannels() {
         return ParseInstallation.getCurrentInstallation().getList("channels");
     }

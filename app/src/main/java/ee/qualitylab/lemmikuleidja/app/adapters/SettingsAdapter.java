@@ -11,19 +11,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.Set;
 
 import ee.qualitylab.lemmikuleidja.app.R;
-import ee.qualitylab.lemmikuleidja.app.activities.SettingsActivity;
+import ee.qualitylab.lemmikuleidja.app.objects.Settings;
 import ee.qualitylab.lemmikuleidja.app.utilities.Lemmikuleidja;
 
-public class SettingsAdapter extends ArrayAdapter<String> {
+public class SettingsAdapter extends ArrayAdapter<Settings> {
     private final Context context;
-    private final List<String> values;
+    private final List<Settings> values;
 
-    public SettingsAdapter(Context context, List<String> values) {
+    public SettingsAdapter(Context context, List<Settings> values) {
         super(context, R.layout.item_notification_list, values);
         this.context = context;
-        values.add(0,"Aktiivsed teated");
         this.values = values;
     }
 
@@ -32,10 +32,14 @@ public class SettingsAdapter extends ArrayAdapter<String> {
         LayoutInflater inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View rowView;
-        if (position > 0) {
+        if (values.get(position).isHeader()) {
+            rowView = inflater.inflate(R.layout.header_separator_list, parent, false);
+            TextView header = (TextView) rowView.findViewById(R.id.separator);
+            header.setText(values.get(position).getTitle());
+        } else {
             rowView = inflater.inflate(R.layout.item_notification_list, parent, false);
             Switch aSwitch = (Switch) rowView.findViewById(R.id.notification_switch);
-            aSwitch.setText(values.get(position));
+            aSwitch.setText(values.get(position).getTitle());
 
             aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -49,10 +53,6 @@ public class SettingsAdapter extends ArrayAdapter<String> {
                     }
                 }
             });
-        }else {
-            rowView = inflater.inflate(R.layout.header_notification_list, parent, false);
-            TextView header = (TextView) rowView.findViewById(R.id.separator);
-            header.setText(values.get(position));
         }
         return rowView;
     }
