@@ -21,7 +21,6 @@ import static com.parse.ParseInstallation.*;
 
 public class Lemmikuleidja extends Application {
 
-    public static ParseUser currentUser;
     public static final String PARSE_DATA_KEY = "com.parse.Data";
 
     public static List<String> getSubscribedChannels() {
@@ -36,11 +35,11 @@ public class Lemmikuleidja extends Application {
     }
 
     public static void subscribe(String channel) {
-        ParsePush.subscribeInBackground(channel);
+        ParsePush.subscribeInBackground(replaceSpecialCharacters(channel));
     }
 
     public static void unsubscribe(String channel) {
-        ParsePush.unsubscribeInBackground(channel);
+        ParsePush.unsubscribeInBackground(replaceSpecialCharacters(channel));
     }
 
     public static String getDataFromIntent(Intent intent) {
@@ -54,6 +53,20 @@ public class Lemmikuleidja extends Application {
             // Json was not readable...
         }
         return city;
+    }
+
+    public static String replaceSpecialCharacters(String oldValue){
+        String string = oldValue;
+        if(oldValue.contains("ä")){
+            string = oldValue.replaceAll("ä","a");
+        }else if (oldValue.contains("õ")){
+            string = oldValue.replaceAll("õ","o");
+        }else if (oldValue.contains("ü")){
+            string = oldValue.replaceAll("ü","u");
+        }else if (oldValue.contains("ö")){
+            string = oldValue.replaceAll("ö","o");
+        }
+        return string;
     }
 
 }

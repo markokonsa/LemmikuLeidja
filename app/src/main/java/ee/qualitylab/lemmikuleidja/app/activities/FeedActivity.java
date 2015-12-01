@@ -249,7 +249,7 @@ public class FeedActivity extends BaseDrawerActivity {
         MenuItem item = mainMenu.findItem(R.id.action_notification);
         List<String> channels = Lemmikuleidja.getSubscribedChannels();
         if (channels != null) {
-            if (channels.contains(city) && !city.isEmpty()) {
+            if (channels.contains(Lemmikuleidja.replaceSpecialCharacters(city)) && !city.isEmpty()) {
                 item.setTitle("ON");
             } else {
                 item.setTitle("OFF");
