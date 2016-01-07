@@ -15,6 +15,9 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import ee.qualitylab.lemmikuleidja.app.R;
 
+/**
+ * Kasutatud on Instagrami template, kahjuks enam antud projekti ei eksisteeri.
+ * */
 public class SendingProgressView extends View {
   public static final int STATE_NOT_STARTED = 0;
   public static final int STATE_PROGRESS_STARTED = 1;

@@ -16,6 +16,8 @@ import ee.qualitylab.lemmikuleidja.app.R;
 import ee.qualitylab.lemmikuleidja.app.service.LocationService;
 import ee.qualitylab.lemmikuleidja.app.utilities.Lemmikuleidja;
 
+import static android.view.Gravity.*;
+
 public class BaseDrawerActivity extends BaseActivity {
 
     public static boolean enteredByHand = false;
@@ -76,13 +78,13 @@ public class BaseDrawerActivity extends BaseActivity {
 
 
             if (locationService.getLocationFromString(addAddressET.getText().toString()) == null || addAddressET.getText().toString().equals("")) {
-                drawerLayout.openDrawer(Gravity.LEFT);
+                drawerLayout.openDrawer(LEFT);
             }
 
             getToolbar().setNavigationOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    drawerLayout.openDrawer(Gravity.LEFT);
+                    drawerLayout.openDrawer(LEFT);
                 }
             });
         }
@@ -113,7 +115,7 @@ public class BaseDrawerActivity extends BaseActivity {
         Address address = locationService.getLocationFromString(item.getTitle().toString());
         addAddressET.setText(address.getAddressLine(0) + ", " + address.getAddressLine(1));
         addAddressET.setTextColor(Color.GREEN);
-        drawerLayout.closeDrawer(Gravity.LEFT);
+        drawerLayout.closeDrawer(LEFT);
     }
 
     public void onSettingsClick(MenuItem item) {

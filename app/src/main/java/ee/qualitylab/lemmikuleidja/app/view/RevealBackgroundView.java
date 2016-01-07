@@ -14,6 +14,9 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Interpolator;
 
+/**
+ * Kasutatud on Instagrami template, kahjuks enam antud projekti ei eksisteeri.
+ * */
 public class RevealBackgroundView extends View {
   public static final int STATE_NOT_STARTED = 0;
   public static final int STATE_FILL_STARTED = 1;

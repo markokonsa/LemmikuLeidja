@@ -7,11 +7,18 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.view.*;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -20,11 +27,6 @@ import ee.qualitylab.lemmikuleidja.app.objects.Post;
 import ee.qualitylab.lemmikuleidja.app.utilities.Utils;
 import ee.qualitylab.lemmikuleidja.app.view.SendingProgressView;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.List;
-
 public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int VIEW_TYPE_DEFAULT = 1;
     private static final int VIEW_TYPE_LOADER = 2;
@@ -32,7 +34,6 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private int lastAnimatedPosition = -1;
     private int itemsCount = 0;
-    private boolean animateItems = false;
 
     private boolean showLoadingView = false;
     private int loadingViewSize = Utils.dpToPx(200);
@@ -184,7 +185,7 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public void updateItems(boolean animated) {
         itemsCount = posts.size();
-        animateItems = animated;
+        boolean animateItems = animated;
         notifyDataSetChanged();
     }
 

@@ -6,6 +6,9 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+/**
+ * Kasutatud on Instagrami template, kahjuks enam antud projekti ei eksisteeri.
+ * */
 public class SquaredFrameLayout extends FrameLayout {
   public SquaredFrameLayout(Context context) {
     super(context);

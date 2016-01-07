@@ -17,10 +17,6 @@ public class Settings {
         return isHeader;
     }
 
-    public void setIsHeader(boolean isHeader) {
-        this.isHeader = isHeader;
-    }
-
     public String getTitle() {
         return title;
     }
